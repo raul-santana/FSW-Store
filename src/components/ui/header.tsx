@@ -91,7 +91,9 @@ const Header = () => {
                 </SheetContent>
             </Sheet>
 
-            <h1 className="font-semibold text-lg text-primary">FSW Store</h1>
+            <h1 className="font-semibold text-lg">
+                <span className="text-primary">FSW</span> Store
+            </h1>
 
             <Button size="icon" variant="outline">
                 <ShoppingCart />
