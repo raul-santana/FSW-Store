@@ -7,7 +7,7 @@ const CatalogPage = async () => {
 
     const categories = await prismaClient.category.findMany({})
 
-    return ( 
+    return (
         <div className="p-5 flex flex-col gap-8">
             <Badge className="w-fit gap-1 uppercase text-base border-2 border-primary px-3 py-[0.375rem]" variant="outline">
                 <ShapesIcon size={16}/>
