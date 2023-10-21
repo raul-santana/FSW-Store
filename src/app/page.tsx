@@ -3,7 +3,7 @@ import Image from "next/image"
 import Categories from "./(home)/components/categories"
 import ProductList from "../components/ui/product-list"
 import { prismaClient } from "@/lib/prisma"
-import SectionTitle from "./(home)/components/section-title"
+import SectionTitle from "../components/ui/section-title"
 import PromoBanner from "./(home)/components/promo-banner"
 
 export default async function Home() {
