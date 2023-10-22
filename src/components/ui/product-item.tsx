@@ -26,7 +26,7 @@ const ProductItem = ({product}: ProductItemProps) => {
 
                     {product.discountPercentage > 0 && (
                         <DiscountBadge className="absolute left-3 top-3">
-                            {product.discountPercentage}
+                            {product.discountPercentage}%
                         </DiscountBadge>
                     )}
                 </div>
