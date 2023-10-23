@@ -1,121 +1,143 @@
-"use client"
+"use client";
 
 import { ProductWithTotalPrice } from "@/helpers/product";
-import { ReactNode, createContext, useState } from "react";
+import { ReactNode, createContext, useMemo, useState } from "react";
 
 export interface CartProduct extends ProductWithTotalPrice {
-    quantity: number;
+  quantity: number;
 }
 
-interface ICardContext {
-    products: CartProduct[];
-    cartTotalPrice: number;
-    cartBasePrice: number; // no discount
-    cartTotalDiscount: number;
-    addProductToCart: (product: CartProduct) => void;
-    decreaseProductQuantity: (productId: string) => void;
-    increaseProductQuantity: (productId: string) => void;
-    removeProductFromCart: (productId: string) => void;
+interface ICartContext {
+  products: CartProduct[];
+  cartTotalPrice: number;
+  cartBasePrice: number;
+  cartTotalDiscount: number;
+  total: number;
+  subtotal: number;
+  totalDiscount: number;
+  addProductToCart: (product: CartProduct) => void;
+  decreaseProductQuantity: (productId: string) => void;
+  increaseProductQuantity: (productId: string) => void;
+  removeProductFromCart: (productId: string) => void;
 }
 
-export const CartContext = createContext<ICardContext>({
-    products:[],
-    cartTotalPrice: 0,
-    cartBasePrice: 0,
-    cartTotalDiscount: 0,
-    addProductToCart: () => {},
-    decreaseProductQuantity: () => {},
-    increaseProductQuantity: () => {},
-    removeProductFromCart: () => {},
-})
+export const CartContext = createContext<ICartContext>({
+  products: [],
+  cartTotalPrice: 0,
+  cartBasePrice: 0,
+  cartTotalDiscount: 0,
+  total: 0,
+  subtotal: 0,
+  totalDiscount: 0,
+  addProductToCart: () => {},
+  decreaseProductQuantity: () => {},
+  increaseProductQuantity: () => {},
+  removeProductFromCart: () => {},
+});
 
-const CartProvider = ({ children }: { children: ReactNode}) => {
+const CartProvider = ({ children }: { children: ReactNode }) => {
+  const [products, setProducts] = useState<CartProduct[]>([]);
 
-    const [products, setProducts] = useState<CartProduct[]>([])
+  // Total sem descontos
+  const subtotal = useMemo(() => {
+    return products.reduce((acc, product) => {
+      return acc + Number(product.basePrice);
+    }, 0);
+  }, [products]);
 
-    const addProductToCart = (product: CartProduct) => {
-        // se o produto já estiver no carrinho, apenas aumente a sua quantidade
-        const productIsAlreadyOnCart = products.some(
-          (cartProduct) => cartProduct.id === product.id,
-        );
-    
-        if (productIsAlreadyOnCart) {
-          setProducts((prev) =>
-            prev.map((cartProduct) => {
-              if (cartProduct.id === product.id) {
-                return {
-                  ...cartProduct,
-                  quantity: cartProduct.quantity + product.quantity,
-                };
-              }
-    
-              return cartProduct;
-            }),
-          );
-    
-          return;
-        }
-    
-        // se não, adicione o produto à lista
-        setProducts((prev) => [...prev, product]);
-    };
+  // Total com descontos
+  const total = useMemo(() => {
+    return products.reduce((acc, product) => {
+      return acc + product.totalPrice;
+    }, 0);
+  }, [products]);
 
-    const decreaseProductQuantity = (productId: string) => {
-      setProducts((prev) =>
-        prev
-          .map((cartProduct) => {
-            if (cartProduct.id === productId) {
-              return {
-                ...cartProduct,
-                quantity: cartProduct.quantity - 1,
-              };
-            }
-  
-            return cartProduct;
-          })
-          .filter((cartProduct) => cartProduct.quantity > 0),
-      );
-    };
+  const totalDiscount = subtotal - total;
 
-    const increaseProductQuantity = (productId: string) => {
+  const addProductToCart = (product: CartProduct) => {
+    // se o produto já estiver no carrinho, apenas aumente a sua quantidade
+    const productIsAlreadyOnCart = products.some(
+      (cartProduct) => cartProduct.id === product.id,
+    );
+
+    if (productIsAlreadyOnCart) {
       setProducts((prev) =>
         prev.map((cartProduct) => {
-          if (cartProduct.id === productId) {
+          if (cartProduct.id === product.id) {
             return {
               ...cartProduct,
-              quantity: cartProduct.quantity + 1,
+              quantity: cartProduct.quantity + product.quantity,
             };
           }
-  
+
           return cartProduct;
         }),
       );
-    };
 
-    const removeProductFromCart = (productId: string) => {
-      setProducts((prev) =>
-        prev.filter((cartProduct) => cartProduct.id !== productId),
-      );
-    };
+      return;
+    }
 
-    return ( 
+    // se não, adicione o produto à lista
+    setProducts((prev) => [...prev, product]);
+  };
 
-        <CartContext.Provider
-            value={{
-                products,
-                cartTotalPrice: 0,
-                cartBasePrice: 0,
-                cartTotalDiscount: 0,
-                addProductToCart,
-                decreaseProductQuantity,
-                increaseProductQuantity,
-                removeProductFromCart
-            }}
-        >
-            {children}
-        </CartContext.Provider>
+  const decreaseProductQuantity = (productId: string) => {
+    setProducts((prev) =>
+      prev
+        .map((cartProduct) => {
+          if (cartProduct.id === productId) {
+            return {
+              ...cartProduct,
+              quantity: cartProduct.quantity - 1,
+            };
+          }
 
-     );
-}
- 
+          return cartProduct;
+        })
+        .filter((cartProduct) => cartProduct.quantity > 0),
+    );
+  };
+
+  const increaseProductQuantity = (productId: string) => {
+    setProducts((prev) =>
+      prev.map((cartProduct) => {
+        if (cartProduct.id === productId) {
+          return {
+            ...cartProduct,
+            quantity: cartProduct.quantity + 1,
+          };
+        }
+
+        return cartProduct;
+      }),
+    );
+  };
+
+  const removeProductFromCart = (productId: string) => {
+    setProducts((prev) =>
+      prev.filter((cartProduct) => cartProduct.id !== productId),
+    );
+  };
+
+  return (
+    <CartContext.Provider
+      value={{
+        products,
+        total,
+        subtotal,
+        totalDiscount,
+        cartTotalPrice: 0,
+        cartBasePrice: 0,
+        cartTotalDiscount: 0,
+        addProductToCart,
+        decreaseProductQuantity,
+        increaseProductQuantity,
+        removeProductFromCart,
+      }}
+    >
+      {children}
+    </CartContext.Provider>
+  );
+};
+
 export default CartProvider;
