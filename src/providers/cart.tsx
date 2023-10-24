@@ -37,14 +37,17 @@ export const CartContext = createContext<ICartContext>({
 
 const CartProvider = ({ children }: { children: ReactNode }) => {
 
-  const [products, setProducts] = useState<CartProduct[]>(() => {
-    const storedCartProducts = localStorage.getItem("@fsw-store/cart-products")
-    if(storedCartProducts){
-      return JSON.parse(storedCartProducts)
-    } else {
-      return []
-    }
-  });
+  const [products, setProducts] = useState<CartProduct[]>([]);
+
+  useEffect(() => {
+    setProducts(
+      JSON.parse(localStorage.getItem("@fsw-store/cart-products") || "[]"),
+    );
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("@fsw-store/cart-products", JSON.stringify(products));
+  }, [products]);
 
   // Total sem descontos
   const subtotal = useMemo(() => {
@@ -126,11 +129,6 @@ const CartProvider = ({ children }: { children: ReactNode }) => {
       prev.filter((cartProduct) => cartProduct.id !== productId),
     );
   };
-
-
-  useEffect(() => {
-    localStorage.setItem("@fsw-store/cart-products", JSON.stringify(products));
-  }, [products]);
 
   return (
     <CartContext.Provider
