@@ -36,13 +36,18 @@ export const CartContext = createContext<ICartContext>({
 });
 
 const CartProvider = ({ children }: { children: ReactNode }) => {
-  const [products, setProducts] = useState<CartProduct[]>(
-    JSON.parse(localStorage.getItem("@fsw-store/cart-products") || "[]")
-  );
+  const [products, setProducts] = useState<CartProduct[]>(() => {
+    const storedCartProducts = JSON.parse(localStorage.getItem("@fsw-store/cart-products") || "[]")
+    if(storedCartProducts){
+      return storedCartProducts
+    } else {
+      return []
+    }
+  });
 
   useEffect(() => {
-    localStorage.setItem("@fsw-store/cart-products", JSON.stringify(products))
-  }, [products])
+    localStorage.setItem("@fsw-store/cart-products", JSON.stringify(products));
+  }, [products]);
 
   // Total sem descontos
   const subtotal = useMemo(() => {
@@ -129,16 +134,16 @@ const CartProvider = ({ children }: { children: ReactNode }) => {
     <CartContext.Provider
       value={{
         products,
+        addProductToCart,
+        decreaseProductQuantity,
+        increaseProductQuantity,
+        removeProductFromCart,
         total,
         subtotal,
         totalDiscount,
         cartTotalPrice: 0,
         cartBasePrice: 0,
         cartTotalDiscount: 0,
-        addProductToCart,
-        decreaseProductQuantity,
-        increaseProductQuantity,
-        removeProductFromCart,
       }}
     >
       {children}
