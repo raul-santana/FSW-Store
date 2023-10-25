@@ -130,7 +130,11 @@ const Header = () => {
             <Sheet>
                 <SheetTrigger asChild>
                     <Button size="icon" variant="outline" className="relative">
-                        <span className="bg-primary rounded-lg w-6 h-6 flex items-center justify-center text-sm font-bold absolute top-[calc(-1.25rem/2)] right-[calc(-1.25rem/2)]">{cartQuantityItems}</span>
+                        {cartQuantityItems > 0 && (
+                            <span className="bg-primary rounded-lg w-6 h-6 flex items-center justify-center text-sm font-bold absolute top-[calc(-1.25rem/2)] right-[calc(-1.25rem/2)]">
+                                {cartQuantityItems}
+                            </span>
+                        )}
                         <ShoppingCart />
                     </Button>
                 </SheetTrigger>
