@@ -11,18 +11,18 @@ export const dynamic = "force-dynamic";
 
 const OrderPage = async ({ searchParams }:{searchParams?: {orderId: string}}) => {
 
-    const user = getServerSession(authOptions)
+    const session = await getServerSession(authOptions);
 
     
     const orderId = searchParams?.orderId;
 
-    if(!user){
-        return <p>Access Denied</p>
+    if (!session || !session.user) {
+        return <p>Access Denied</p>;
     }
 
     const orders = await prismaClient.order.findMany({
         where: {
-            userId: (user as any).id
+            userId: session.user.id
         },
         include: {
             orderProducts: {
