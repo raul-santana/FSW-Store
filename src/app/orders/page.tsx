@@ -17,9 +17,12 @@ const OrderPage = async ({ searchParams }:{searchParams?: {orderId: string}}) =>
     const orderId = searchParams?.orderId;
 
     if (!session || !session.user) {
-        return <p className="mt-4 text-center text-lg font-bold">
-            Faça o login para visualizar seus pedidos.
-        </p>;
+        return (
+            <div className="flex h-full flex-col items-center justify-center gap-2 p-5">
+                <h2 className="font-bold">Acesso Negado!</h2>
+                <p className="text-sm opacity-60">Faça login para ver seus pedidos</p>
+            </div>
+        )
     }
 
     const orders = await prismaClient.order.findMany({
