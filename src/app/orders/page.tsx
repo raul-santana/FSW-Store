@@ -4,12 +4,17 @@ import { prismaClient } from "@/lib/prisma";
 import { Package } from "lucide-react";
 import { getServerSession } from "next-auth";
 import OrderItem from "./components/order-item";
+import { Accordion } from "@/components/ui/accordion";
+
 
 export const dynamic = "force-dynamic";
 
-const OrderPage = async () => {
+const OrderPage = async ({ searchParams }:{searchParams?: {orderId: string}}) => {
 
     const user = getServerSession(authOptions)
+
+    
+    const orderId = searchParams?.orderId;
 
     if(!user){
         return <p>Access Denied</p>
@@ -39,10 +44,12 @@ const OrderPage = async () => {
                 Meus Pedidos
             </Badge>
 
-            <div className="mt-5 flex flex-col gap-5">
-                {orders.map(order =>(
-                    <OrderItem key={order.id} order={order}/>
-                ))}
+            <div className="mt-5">
+                <Accordion type="single" className="w-full flex flex-col gap-5" collapsible defaultValue={orderId}>
+                    {orders.map(order =>(
+                        <OrderItem key={order.id} order={order}/>
+                    ))}
+                </Accordion>
             </div>
 
         </div>

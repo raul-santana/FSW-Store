@@ -39,7 +39,6 @@ const OrderItem = ({order}: OrderItemProps) => {
 
     return ( 
         <Card className="px-5">
-            <Accordion type="single" className="w-full" collapsible>
                 <AccordionItem value={order.id}>
                     <AccordionTrigger>
                         <div className="flex flex-col gap-1 text-left">
@@ -107,7 +106,6 @@ const OrderItem = ({order}: OrderItemProps) => {
                         </div>
                     </AccordionContent>
                 </AccordionItem>
-            </Accordion>
         </Card>
      );
 }
