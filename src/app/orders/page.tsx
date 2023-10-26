@@ -44,7 +44,7 @@ const OrderPage = async ({ searchParams }:{searchParams?: {orderId: string}}) =>
     return ( 
         <div className="p-5">
 
-            <Badge className="w-fit gap-1 uppercase text-base border-2 border-primary px-3 py-[0.375rem]" variant="outline">
+            <Badge variant="heading">
                 <Package size={16}/>
                 Meus Pedidos
             </Badge>

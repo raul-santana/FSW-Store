@@ -20,8 +20,7 @@ const DealsPage = async () => {
         <div className="p-5 flex flex-col gap-8">
 
             <Badge
-                className="w-fit gap-1 border-2 border-primary px-3 py-[0.375rem] text-base uppercase"
-                variant="outline"
+                variant="heading"
             >
                 <PercentIcon size={16} />
                 Ofertas
