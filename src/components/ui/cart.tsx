@@ -1,6 +1,6 @@
 import { ShoppingCartIcon } from "lucide-react";
 import { Badge } from "./badge";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { CartContext } from "@/providers/cart";
 import CartItem from "./cart-item";
 import { computeProductTotalPrice } from "@/helpers/product";
@@ -11,28 +11,43 @@ import { createCheckout } from "@/actions/checkout";
 import { loadStripe } from "@stripe/stripe-js";
 import { createOrder } from "@/actions/order";
 import { useSession } from "next-auth/react";
+import { SheetClose } from "./sheet";
 
 const Cart = () => {
+  const [ isCreatingCheckoutSession, setIsCreatingCheckoutSession ] = useState(false)
   const {data} = useSession()
-  const { products, subtotal, total, totalDiscount } = useContext(CartContext);
+  const { products, subtotal, total, totalDiscount, cleanCart } = useContext(CartContext);
 
   const handleFinishPurchaseClick = async () => {
 
+    
     if(!data?.user){
       //redirecionar para o login
+      alert('Faça o login para realizar uma compra!')
       return;
     }
-    const order = await createOrder(products, (data.user as any).id)
 
-    const checkout = await createCheckout(products, order.id);
+    setIsCreatingCheckoutSession(true)
 
-    // Criar pedido no banco
+    try{
+      const order = await createOrder(products, (data.user as any).id)
 
-    const stripe = await loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY);
+      const checkout = await createCheckout(products, order.id);
+  
+      const stripe = await loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY);
 
-    stripe?.redirectToCheckout({
-      sessionId: checkout.id,
-    });
+      if(stripe){
+
+        cleanCart()
+
+        stripe.redirectToCheckout({
+          sessionId: checkout.id,
+        });
+      }
+    }catch{
+      setIsCreatingCheckoutSession(false)
+      alert('Falha ao redirecionar ao checkout')
+    }
   };
 
   return (
@@ -93,13 +108,15 @@ const Cart = () => {
             <p>Total</p>
             <p>R$ {total.toFixed(2)}</p>
             </div>
-
+            
             <Button
             className="mt-7 font-bold uppercase"
             onClick={handleFinishPurchaseClick}
+            disabled={isCreatingCheckoutSession}
             >
-            Finalizar compra
+              Finalizar compra
             </Button>
+            
         </div>
       )}
     </div>
